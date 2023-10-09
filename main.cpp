@@ -1,4 +1,5 @@
 #include <iostream>
+#include "cstring"
 #include "src/Queue.h"
 #include "src/Process.h"
 #include "random"
@@ -13,6 +14,7 @@ int main(int argc, char** argv) {
     bool showResult = false;
     bool ioBump = false;
     unsigned int seed = 0;
+    int* returnValue;
 
     std::mt19937 gen(seed); // 使用 Mersenne Twister 作为随机数生成器
     std::uniform_int_distribution<int> distribution(1, 10000);
@@ -147,6 +149,7 @@ int main(int argc, char** argv) {
                 }
                 Process *tmp = new Process(60000 + distribution(gen), length, ioFreq, arriveTime);
                 incomingProcessList.push_back(tmp);
+
                 jobNum += 1;
             } else {
                 std::cerr << "Missing argument after -A" << std::endl;
@@ -178,66 +181,72 @@ int main(int argc, char** argv) {
     }
 
     // print configurations
-    std::cout << "Configurations:";
+    std::cout << "Successfully read in Configurations:";
     std::cout << "\n\tNumber of Queue:\t" << numQueues;
-    if (! allotmentList.empty()) {
-        std::cout << "\n\tAllotment:\t\t\t";
+    if (! quantumList.empty()) {
+        std::cout << "\n\tQuantum:\t\t";
         for (int q: quantumList) {
             std::cout << q << " ";
         }
+    }
+    if (! allotmentList.empty()) {
+        std::cout << "\n\tAllotment:\t\t";
+        for (int a: allotmentList) {
+            std::cout << a << " ";
+        }
     } else {
         std::cout << "\n\tAllotment:\t\t\t" << allotment;
-
     }
     std::cout << "\n\tRandom Seed:\t\t" << seed;
+    std::cout << "\n\tBoost:\t\t\t" << boost;
+    std::cout << "\n\tIO duration:\t\t" << ioTime;
     std::cout << "\n\n";
     std::cout << "Incoming process:\n";
     std::cout << incomingProcessList[0]->toString();
     std::cout << incomingProcessList[1]->toString();
     std::cout << incomingProcessList[2]->toString();
 
-    // initialize all the component
-
-    // run time configuration
+    // initialize run time configuration
     int currentTime = 0;
     int finishedJob = 0;
     int boostCounter = 0;
+    Process *currentProcess = nullptr;
     std::vector<std::vector<Process*>> IOQueue(ioTime);
     std::vector<Queue *> queueList;
     queueList.reserve(numQueues);
 
-    // initialize all queues
+    // initialize queues
     for (i = 0; i < numQueues; i++) {
-        queueList.emplace_back(new Queue(numQueues - i - 1, quantum));
-        std::cout << queueList[i]->toString();
+        queueList.emplace_back(new Queue(numQueues - i - 1, quantumList[i]));
     }
 
-    Process *currentProcess = nullptr;
-    Queue *currentQueue = nullptr;
-
-    std::cout << "here";
+    std::cout << "\n\n";
     // main loop for the scheduler
     while (finishedJob < jobNum) {
-        std::cout << "Current time: " << currentTime;
         // check if have new job incoming
         for (Process *p: incomingProcessList) {
             if (p->getArriveTime() == currentTime) {
                 queueList[0]->addProcess(p);
+                std::cout << "Process " << p->getPid() << " comes\n";
             }
         }
+
         // check if have io finished job
-        // lots of tests needed here
         std::vector<Process*>& ioQueue0 = IOQueue[0]; // 获取对第一个容器的引用
 
         for (auto it = ioQueue0.begin(); it != ioQueue0.end();) {
             Process* p = *it; // 获取当前元素的指针
-            std::cout << "Process " << p->getPid() << "IO finished";
+            std::cout << "Process " << p->getPid() << " IO finished.\n";
+            p->resetIOTime();
 
             // 向前移动一格
             if (ioBump) {
-                p->getQueueBelongTo()->addProcessToHead(p);
+                Queue* belongTo = p->getQueueBelongTo();
+                belongTo->addProcessToHead(p);
             } else {
-                p->getQueueBelongTo()->addProcess(p);
+                Queue* belongTo = p->getQueueBelongTo();
+                if (belongTo)
+                belongTo->addProcess(p);
             }
 
             // 删除当前元素，并将迭代器指向下一个元素
@@ -248,6 +257,8 @@ int main(int argc, char** argv) {
         for (int j = 1; j < ioTime; j++) {
             IOQueue[j-1] = std::move(IOQueue[j]);
         }
+        // 重新初始化一个空的list
+        IOQueue[ioTime-1] = std::vector<Process*>();
         IOQueue[4].clear();
 
 
@@ -260,10 +271,20 @@ int main(int argc, char** argv) {
 
         // select the process to run
         if (currentProcess == nullptr) {
+
             // check which queue have remaining task, then fetch and execute
             for (Queue *queue: queueList) {
                 if (queue->getLength() != 0) {
+
+                    // print current queues' status
+                    std::cout << "Current queue status:\n";
+                    for (Queue* q: queueList) {
+                        std::cout << q->toString();
+                    }
+
                     currentProcess = queue->getFirstProcess();
+                    currentProcess->setQueueBelongTo(queue);
+                    currentProcess->setRemainQuantum(queue->getQuantum());
                     break;
                 }
             }
@@ -271,32 +292,49 @@ int main(int argc, char** argv) {
 
         // error check if no process selected
         if (currentProcess == nullptr) {
-            std::cout << "Failed to get a process to run.";
-            exit(1);
+            std::cout << "Time " << currentTime << " empty run: No available Process in queues.\n";
+            currentTime += 1;
+            continue;
         }
 
         // execute process and respond to the return value
-        int* returnValue;
-        std::cout << "Time: " << currentTime;
+        std::cout << "Time " << currentTime << " execute: ";
         returnValue = currentProcess->execute();
 
-        // process finished
+//        std::cout << returnValue[0] << returnValue[1] << returnValue[2] << "\n";
+
+        // if process finished
         if (returnValue[0] == 1) {
             // put the process to finished process queue
             currentProcess->setFinishTime(currentTime);
             finishedProcessList.push_back(currentProcess);
+            currentProcess = nullptr;
             finishedJob += 1;
         }
 
-        // process starts an IO
+        // if process starts an IO
         if (returnValue[1] == 1) {
+
+            std::cout << "Process " << currentProcess->getPid() << " starts IO, ";
+            std::cout << "switch to another process.\n";
+
             // push the process to the end of the IOQueue list
-            currentProcess->setQueueBelongTo(currentQueue);
+            currentProcess->setQueueBelongTo(currentProcess->getQueueBelongTo());
             IOQueue[ioTime-1].push_back(currentProcess);
+            currentProcess = nullptr;
+        } else if (returnValue[2] == 1) {
+            // if process used up quantum
+            std::cout << "Process " << currentProcess->getPid() << " used up its quantum, ";
+            std::cout << "switch to another process.\n";
+
+            Queue* q = currentProcess->getQueueBelongTo();
+            if (q->getPriority() != 0) {
+                queueList[numQueues - q->getPriority()]->addProcess(currentProcess);
+            } else {
+                q->addProcess(currentProcess);
+            }
+            currentProcess = nullptr;
         }
-
-
-
 
         // print what is done in this time clock
 
@@ -305,6 +343,14 @@ int main(int argc, char** argv) {
 
     // all processes finished and calculate average turnaround time
 
+    // free all blocks
+    for (Queue* q: queueList) {
+        delete(q);
+    }
+    for (Process* p: incomingProcessList) {
+        delete(p);
+    }
+    delete[] returnValue;
     return 0;
 
 }

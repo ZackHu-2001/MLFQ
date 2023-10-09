@@ -45,9 +45,15 @@ void Queue::setQuantum(int quantum) {
 
 std::string Queue::toString() {
     std::ostringstream oss;
-    oss << "Queue " << priority << ": " << "quantum = " << quantum << "\n";
-    for (const auto & i : processList) {
-        oss << i->toString();
+    oss << "Queue " << priority << ": " << "  quantum = " << quantum << "   ";
+    oss << "Process list: ";
+    if (processList.empty()) {
+        oss << "EMPTY\n";
+    } else {
+        oss << "\n";
+        for (const auto & i : processList) {
+            oss << i->toString();
+        }
     }
     return oss.str();
 }

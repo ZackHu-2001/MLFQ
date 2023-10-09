@@ -16,8 +16,9 @@ Process::Process(int pid, int totalRunTime, int ioFrequency, int arriveTime)
     }
     if (ioFrequency == 0) {
         nextIO = -1;
+    } else {
+        nextIO = ioFrequency;
     }
-
 }
 
 void Process::decreaseAllotment() {
@@ -71,7 +72,8 @@ int* Process::execute() {
         nextIO -= 1;
     }
     std::cout << "Process " << pid << "   quantum: [" << remainQuantum << " / " << (queueBelongTo)->getQuantum() << "] ";
-    std::cout << "  total run time: [" << totalRunTime - remainingTotalRunTime << " / "<< totalRunTime << "]\n";
+    std::cout << "  total run time: [" << totalRunTime - remainingTotalRunTime << " / "<< totalRunTime << "] ";
+    std::cout << "  next IO: " << nextIO << "\n";
 
     result[0] = 0;
     result[1] = 0;
@@ -82,13 +84,11 @@ int* Process::execute() {
         return result;
     }
     if (nextIO == 0) {
-        std::cout << "Process " << pid << " starts IO\n";
         nextIO = ioFrequency;
         allotment -= 1;
         result[1] = 1;
     }
     if (remainQuantum == 0) {
-        std::cout << "Process " << pid << " used up its quantum\n";
         result[2] = 1;
     }
 
