@@ -11,10 +11,13 @@ class Process;
 class Queue {
 public:
     Queue(int priority, int quantum);
-    Process* getFirstProcess();
     void addProcess(Process* p);
     void addProcessToHead(Process* p);
     int getLength();
+    int getQuantum();
+    int getPriority();
+    Process* getFirstProcess();
+    void setQuantum(int quantum);
     std::string toString();
 
 private:

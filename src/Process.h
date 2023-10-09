@@ -17,7 +17,9 @@ public:
     int* execute();
     void setFinishTime(int currentTime);
     void setQueueBelongTo(Queue* q);
+    void setRemainQuantum(int quantum);
     void decreaseAllotment();
+    void resetIOTime();
     void resetAllotment(int allotment);
     std::string toString() const;
 
@@ -31,6 +33,7 @@ private:
     int allotment;
     int runTime;
     int nextIO;
+    int remainQuantum;
     Queue* queueBelongTo;
 };
 

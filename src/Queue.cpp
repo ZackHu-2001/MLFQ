@@ -8,17 +8,6 @@
 
 Queue::Queue(int priority, int quantum) : priority(priority), quantum(quantum), len(0), processList() {}
 
-
-Process* Queue::getFirstProcess() {
-    if (processList.empty()) {
-        return nullptr;
-    } else {
-        auto* p = processList[0];
-        processList.pop_back();
-        return p;
-    }
-}
-
 void Queue::addProcess(Process* p) {
     processList.push_back(p);
 }
@@ -31,9 +20,32 @@ int Queue::getLength() {
     return static_cast<int>(processList.size());
 }
 
+int Queue::getQuantum() {
+    return quantum;
+}
+
+int Queue::getPriority() {
+    return priority;
+}
+
+Process* Queue::getFirstProcess() {
+    if (processList.empty()) {
+        return nullptr;
+    } else {
+        auto* p = processList[0];
+        processList.erase(processList.begin());
+//        processList.pop_front();
+        return p;
+    }
+}
+
+void Queue::setQuantum(int quantum) {
+    this->quantum = quantum;
+}
+
 std::string Queue::toString() {
     std::ostringstream oss;
-    oss << "Queue " << priority << ": \n";
+    oss << "Queue " << priority << ": " << "quantum = " << quantum << "\n";
     for (const auto & i : processList) {
         oss << i->toString();
     }
