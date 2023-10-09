@@ -8,16 +8,25 @@
 
 class Process {
 public:
-    Process(int pid, int length, int ioFrequency, int allotment);
+    Process(int pid, int length, int ioFrequency, int arriveTime);
     int getAllotment() const;
-    int getLength() const;
+    int getTotalRunTime() const;
+    int getArriveTime() const;
+    int* execute();
     void decreaseAllotment();
     void resetAllotment(int allotment);
+    std::string toString() const;
+
 private:
     const int pid;
-    const int length;
+    const int totalRunTime;
+    int remainingTotalRunTime;
     const int ioFrequency;
+    const int arriveTime;
+    int finishTime;
     int allotment;
+    int runTime;
+    int nextIO;
 };
 
 

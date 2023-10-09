@@ -1,6 +1,7 @@
 //
 // Created by ZackHu on 2023-10-07.
 //
+
 #include "vector"
 #include "Process.h"
 
@@ -10,11 +11,17 @@
 
 class Queue {
 public:
+    Queue(int priority, int quantum);
+    Process* getFirstProcess();
+    void addProcess(Process* p);
+    int getLength();
+    std::string toString();
 
 private:
     int priority;
     int quantum;
-    std::vector<Process> processList;
+    int len;
+    std::vector<Process*> processList;
 
 };
 
