@@ -73,6 +73,12 @@ build CMakeFiles/MLFQ.dir/src/Process.cpp.o: CXX_COMPILER__MLFQ_unscanned_Debug 
   OBJECT_DIR = CMakeFiles/MLFQ.dir
   OBJECT_FILE_DIR = CMakeFiles/MLFQ.dir/src
 
+build CMakeFiles/MLFQ.dir/src/Configuration.cpp.o: CXX_COMPILER__MLFQ_unscanned_Debug /Users/zackhu/CLionProjects/MLFQ/src/Configuration.cpp || cmake_object_order_depends_target_MLFQ
+  DEP_FILE = CMakeFiles/MLFQ.dir/src/Configuration.cpp.o.d
+  FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk -fcolor-diagnostics
+  OBJECT_DIR = CMakeFiles/MLFQ.dir
+  OBJECT_FILE_DIR = CMakeFiles/MLFQ.dir/src
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target MLFQ
@@ -81,7 +87,7 @@ build CMakeFiles/MLFQ.dir/src/Process.cpp.o: CXX_COMPILER__MLFQ_unscanned_Debug 
 #############################################
 # Link the executable MLFQ
 
-build MLFQ: CXX_EXECUTABLE_LINKER__MLFQ_Debug CMakeFiles/MLFQ.dir/main.cpp.o CMakeFiles/MLFQ.dir/src/MLFQ.cpp.o CMakeFiles/MLFQ.dir/src/Queue.cpp.o CMakeFiles/MLFQ.dir/src/Process.cpp.o
+build MLFQ: CXX_EXECUTABLE_LINKER__MLFQ_Debug CMakeFiles/MLFQ.dir/main.cpp.o CMakeFiles/MLFQ.dir/src/MLFQ.cpp.o CMakeFiles/MLFQ.dir/src/Queue.cpp.o CMakeFiles/MLFQ.dir/src/Process.cpp.o CMakeFiles/MLFQ.dir/src/Configuration.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
   OBJECT_DIR = CMakeFiles/MLFQ.dir
   POST_BUILD = :

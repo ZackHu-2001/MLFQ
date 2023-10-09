@@ -12,4 +12,7 @@ add_executable(MLFQ main.cpp
         src/Queue.cpp
         src/Queue.h
         src/Process.cpp
-        src/Process.h)
+        src/Process.h
+        src/Configuration.cpp
+        src/Configuration.h
+)
