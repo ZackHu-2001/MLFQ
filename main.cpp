@@ -268,7 +268,6 @@ int main(int argc, char** argv) {
         }
         boostCounter += 1;
 
-
         // select the process to run
         if (currentProcess == nullptr) {
 
@@ -277,12 +276,13 @@ int main(int argc, char** argv) {
                 if (queue->getLength() != 0) {
 
                     // print current queues' status
-                    std::cout << "Current queue status:\n";
-                    for (Queue* q: queueList) {
-                        std::cout << q->toString();
-                    }
+//                    std::cout << "Current queue status:\n";
+//                    for (Queue* q: queueList) {
+//                        std::cout << q->toString();
+//                    }
 
                     currentProcess = queue->getFirstProcess();
+                    currentProcess->setFirstRunTime(currentTime);
                     currentProcess->setQueueBelongTo(queue);
                     currentProcess->setRemainQuantum(queue->getQuantum());
                     break;
@@ -300,8 +300,6 @@ int main(int argc, char** argv) {
         // execute process and respond to the return value
         std::cout << "Time " << currentTime << " execute: ";
         returnValue = currentProcess->execute();
-
-//        std::cout << returnValue[0] << returnValue[1] << returnValue[2] << "\n";
 
         // if process finished
         if (returnValue[0] == 1) {
@@ -336,12 +334,16 @@ int main(int argc, char** argv) {
             currentProcess = nullptr;
         }
 
-        // print what is done in this time clock
-
         currentTime += 1;
     }
 
+    int totalResponseTime = 0;
+    int totalTurnaroundTime = 0;
+
     // all processes finished and calculate average turnaround time
+    for (Process* p: finishedProcessList) {
+        p->get
+    }
 
     // free all blocks
     for (Queue* q: queueList) {

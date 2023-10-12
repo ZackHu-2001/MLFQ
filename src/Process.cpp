@@ -10,7 +10,7 @@
 
 Process::Process(int pid, int totalRunTime, int ioFrequency, int arriveTime)
     :pid(pid), totalRunTime(totalRunTime), remainingTotalRunTime(totalRunTime),
-    ioFrequency(ioFrequency), arriveTime(arriveTime), runTime(0) {
+    ioFrequency(ioFrequency), arriveTime(arriveTime), runTime(0), firstRunTime(-1) {
     if (ioFrequency < 0) {
         throw std::invalid_argument("Illegal io frequency.");
     }
@@ -41,8 +41,22 @@ int Process::getArriveTime() const {
     return arriveTime;
 }
 
+int Process::getFirstRunTime() const {
+    return firstRunTime;
+}
+
+int Process::getFinishTime() const {
+    return finishTime;
+}
+
 Queue* Process::getQueueBelongTo() const {
     return queueBelongTo;
+}
+
+void Process::setFirstRunTime(int currentTime) {
+    if (this->firstRunTime == -1) {
+        this->firstRunTime = currentTime;
+    }
 }
 
 void Process::setFinishTime(int currentTime) {

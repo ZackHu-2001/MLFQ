@@ -13,9 +13,12 @@ public:
     int getAllotment() const;
     int getTotalRunTime() const;
     int getArriveTime() const;
+    int getFirstRunTime() const;
+    int getFinishTime() const;
     Queue* getQueueBelongTo() const;
     int* execute();
     void setFinishTime(int currentTime);
+    void setFirstRunTime(int currentTime);
     void setQueueBelongTo(Queue* q);
     void setRemainQuantum(int quantum);
     void decreaseAllotment();
@@ -30,6 +33,7 @@ private:
     const int ioFrequency;
     const int arriveTime;
     int finishTime;
+    int firstRunTime;
     int allotment;
     int runTime;
     int nextIO;
